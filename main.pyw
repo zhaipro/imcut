@@ -14,23 +14,29 @@ def debug(*args):
 
 class MainWindow(QMainWindow):
 
+    Ui_MainWindow, _ = loadUiType('dialog.ui')
+
     def __init__(self):
         super().__init__()
-        Ui_MainWindow, _ = loadUiType('dialog.ui')
-        self.ui = Ui_MainWindow()
+        self.ui = self.Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.pixmap_label = self.ui.pixmap_label
         self.setAcceptDrops(True)   # 必须设置，不然无法接收拖放事件
         self.ui.thresholdSlider.valueChanged.connect(self.threshold_changed)
         self.ui.thresholdBox.valueChanged.connect(self.threshold_changed)
+        self.ui.defaultButton.clicked.connect(lambda: self.threshold_changed())
 
         self.menu_init()
 
-    def threshold_changed(self, value):
+        self.threshold = 35
+
+    def threshold_changed(self, value=35):
         debug('threshold_changed:', value)
         self.ui.thresholdSlider.setValue(value)
         self.ui.thresholdBox.setValue(value)
+        if self.threshold == value:
+            return
+        self.threshold = value
         self._fit()
 
     def menu_init(self):
@@ -66,13 +72,13 @@ class MainWindow(QMainWindow):
     def _fit(self):
         if not hasattr(self, 'im'):
             return
-        threshold = self.ui.thresholdSlider.value()
+        debug('_fit')
         im = self.im.copy()
-        w, s, a, d = utils._capture_detect_1(im, threshold, q=0.2)
+        w, s, a, d = utils._capture_detect_1(im, self.threshold, q=0.2)
         self.cropped_image = self.im[w:s, a:d]
         im = cv2.rectangle(im, (a - 2, w - 2), (d + 1, s + 1), (0, 0, 255), 2)
 
-        self.imshow(self.pixmap_label, im)
+        self.imshow(self.ui.pixmap_label, im)
         self.ui.actionSave.setEnabled(True)
 
     def fit(self, fn):

@@ -18,6 +18,16 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QPushButton" name="defaultButton">
+        <property name="text">
+         <string>默认值</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QSpinBox" name="thresholdBox">
         <property name="value">
          <number>35</number>
